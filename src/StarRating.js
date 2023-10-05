@@ -20,7 +20,7 @@ export default function StarRating({
   size = 48,
   className = ''
 }) {
-  const [rating, setRating] = useState(1);
+  const [rating, setRating] = useState(0);
   const [temrating, setTemprating] = useState(0);
 
   function handleRating(rating) {
