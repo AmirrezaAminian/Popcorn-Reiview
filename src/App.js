@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 
 const average = (arr) =>
@@ -9,9 +9,9 @@ const KEY = "c594812b";
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [query, setQuery] = useState("");
-  const [watched, setWatched] = useState(function() {
-    const storedValue = localStorage.getItem('watched') ;
-    return JSON.parse(storedValue)
+  const [watched, setWatched] = useState(function () {
+    const storedValue = localStorage.getItem("watched");
+    return JSON.parse(storedValue);
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -42,7 +42,6 @@ export default function App() {
       localStorage.setItem("watched", JSON.stringify(watched));
     },
     [watched]
-
   );
 
   useEffect(() => {
@@ -60,7 +59,7 @@ export default function App() {
           throw new Error("Something went wrong with fetching movies");
 
         const data = await res.json();
-        console.log(data.Search);
+        // console.log(data.Search);
         if (data.Response === "False") throw new Error("Movie not found");
         setMovies(data.Search);
         setError("");
@@ -153,6 +152,29 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
+  // useEffect(function () {
+  //   const el = document.querySelector(".search");
+  //   console.log(el);
+  //   el.focus()
+  // }, []);
+
+  const inputEl = useRef(null);
+
+  useEffect(function () {
+    function callBack(e) {
+      if (document.activeElement === inputEl.current) return;
+
+      if (e.code === "Enter") {
+        inputEl.current.focus();
+        setQuery("");
+      }
+    }
+
+    document.addEventListener("keydown", callBack);
+
+    return () => document.addEventListener("keydown", callBack);
+  }, [setQuery]);
+
   return (
     <input
       className="search"
@@ -160,6 +182,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
